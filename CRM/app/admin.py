@@ -20,13 +20,10 @@ class OrderAdmin(admin.ModelAdmin):
     list_filter = ('type', 'status', 'date')
 
     def save_model(self, request, obj, form, change):
-        if not change:
-            obj.issue_by = request.user
-        else:
-            client = Client.objects.get(id=obj.client_id)
-            if client.is_subscribe:
-                msg = f'Ваша заявка {obj.status}'
-                requests.get(f'https://api.telegram.org/bot{settings.TOKEN}/'
-                             f'sendMessage?chat_id={client.chat_id}&text={msg}')
+        client = Client.objects.get(id=obj.client_id)
+        if client.is_subscribe:
+            msg = f'Ваша заявка {obj.status}'
+            requests.get(f'https://api.telegram.org/bot{settings.TOKEN}/'
+                         f'sendMessage?chat_id={client.chat_id}&text={msg}')
 
         super().save_model(request, obj, form, change)
